@@ -14,14 +14,29 @@ app.get('/', (req, res, next)=>{
                 mensaje:'Error acceso DB',
                 errores: err
             })
-            res.status(200).json(proveedores);
-        // res.status(200).json({
-        //     ok: true,
-        //     proveedores: proveedores
-        // });
-        
+        res.status(200).json({
+            ok: true,
+            proveedores: proveedores
+        });        
     });
 
+});
+
+app.get('/:id', function(req, res, next){
+    
+    Proveedor.findById(req.params.id, (err, proveedor)=>{
+        if (err) {   //Si hubiera un error
+            return res.status(500).json({
+                ok:false,
+                mensaje:'Error acceso DB',
+                errores: err
+            })
+        }
+        res.status(200).json({
+            ok: true,
+            proveedor: proveedor
+        });   
+    });
 });
 
 app.post('/', (req,res)=>{
@@ -34,7 +49,7 @@ app.post('/', (req,res)=>{
         domicilio: body.domicilio,
         cp: body.cp,
         localidad: body.localidad,
-        prvincia: body.prvincia,
+        provincia: body.provincia,
         telefono: body.telefono,    
         mail: body.mail,
         contacto: body.contacto,
@@ -51,7 +66,7 @@ app.post('/', (req,res)=>{
         res.status(200).json({  //si la respuesta es correcta
             ok:true, //Y sea verdadero
             proveedor: proveedorGuardado //conteste el proveedor ya creado
-        })
+        });
     });
 });
 
