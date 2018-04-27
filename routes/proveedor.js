@@ -7,20 +7,27 @@ var autentoken = require ('../middleware/autentoken.js')
 var app = express();
 
 app.get('/', (req, res, next)=>{
+
+    var desde = req.query.desde;
+    desde = Number(desde);
     
-    Proveedor.find({}).exec((err, proveedores)=>{ //Para que nos busque todos los proveedores
-        if (err)    //Si hubiera un error
+    Proveedor.find({}).skip(desde).limit(5).exec((err, proveedores)=>{ //Para que nos busque todos los proveedores
+        if (err){    //Si hubiera un error
             return res.status(500).json({
                 ok:false,
                 mensaje:'Error acceso DB',
                 errores: err
             })
+        }
+
+    Proveedor.count({},(err,totales)=>{
         res.status(200).json({
             ok: true,
-            proveedores: proveedores
+            proveedores: proveedores,
+            totales:totales
+            })   
         });        
     })
-
 });
 
 app.get('/:id', function(req, res, next){
