@@ -1,23 +1,24 @@
-var express = require('express'); //Importamos Express
-var mongoose = require('mongoose'); //Importamos mongoose
+var express = require('express');
+var mongoose = require('mongoose');
 
-var Factura = require('../Models/factura.js'); //Conectamos la ruta con el modelo (se puede poner sin parémtesis)
+var Factura = require('../models/factura.js');
 
 var app = express();
 
 app.get('/', (req, res, next) => {
 
-    Factura.find({}).exec((err, facturas) => { //Para que nos busque todos los proveedores
-        if (err)    //Si hubiera un error
+    Factura.find({}).exec((err, facturas)=>{
+        if(err){
             return res.status(500).json({
                 ok: false,
                 mensaje: 'Error acceso DB',
                 errores: err
             })
+        }
         res.status(200).json({
             ok: true,
             facturas: facturas
-        });
+        })
     });
 
 });
@@ -25,73 +26,80 @@ app.get('/', (req, res, next) => {
 app.get('/:id', function(req, res, next){
     
     Factura.findById(req.params.id, (err, factura)=>{
-        if (err) {   //Si hubiera un error
+        if(err){
             return res.status(500).json({
-                ok:false,
-                mensaje:'Error acceso DB',
+                ok: false,
+                mensaje: 'Error acceso DB',
                 errores: err
             })
         }
         res.status(200).json({
             ok: true,
             factura: factura
-        });   
-    });
+        })
+    })  
 });
 
-app.post('/', (req, res) => {
 
-    var body = req.body;   //En el cuerpo de las peticiones res. que hagamos vamos a mandar un json
+app.post('/', (req, res)=>{
 
-    var factura = new Factura({  //Nos creamos la asociación para cada propiedad
+    var body = req.body;
+
+    var factura = new Factura({
         proveedor: body.proveedor,
-        cif:body.cif,
-        base:body.base,
-        fecha:body.fecha,
-        concepto:body.concepto,
+        cif: body.cif,
+        domicilio: body.domicilio,
+        fecha: body.fecha,
+        concepto: body.concepto,
+        base: body.base,
+        retencion: body.retencion,
         tipo: body.tipo,
-        importe: body.importe,
-        total: body.total,
         irpf: body.irpf,
-        retencion: body.retencion
-    })
+        importe: body.importe,
+        total: body.total
+    });
 
-    factura.save((err, facturaGuardada) => {    //Guardar en la base de datos las propiedades que le demos
-        if (err) {   //Si hay error
-            return res.status(400).json({   //conteste con un json
-                ok: false,  //De que es falso
-                mensaje: 'Error al crear la factura', //Con este mensaje
-                errores: err //Error sea err
+    factura.save((err, facturaGuardada)=>{
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Error al crear la factura',
+                errores: err
             })
         }
-        res.status(200).json({  //si la respuesta es correcta
-            ok: true, //Y sea verdadero
-            factura: facturaGuardada //conteste el proveedor ya creado
-        });
+
+        res.status(200).json({
+            ok: true,
+            factura: facturaGuardada
+        })
     });
+
+
 });
 
-app.put('/:id', function (req, res, next) {
-    //params extrae el parámetro de la pregunta (req)
-    Factura.findByIdAndUpdate(req.params.id, req.body, function (err, datos) {
+app.put('/:id', function(req, res, next){
+
+    Factura.findByIdAndUpdate(req.params.id, req.body, function(err, datos){
         if (err) return next(err);
         res.status(201).json({
-            ok: true,
+            ok: 'true',
             mensaje: 'Factura actualizada'
         });
     });
+
 });
 
-app.delete('/:id', function (req, res, error) {
+app.delete('/:id', function(req, res, error){
 
-    Factura.findByIdAndRemove(req.params.id, function (err, datos) {
+    Factura.findByIdAndRemove(req.params.id, function(err, datos){
         if (err) return next(err);
+        var mensaje = 'Factura eliminada';
         res.status(200).json({
-            ok: true,
-            mensaje: 'Factura eliminada'
-        });
-    });
-});
+            ok: 'true',
+            mensaje: mensaje
+        }); 
+    })
 
+});
 
 module.exports = app;

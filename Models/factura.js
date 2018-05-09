@@ -1,22 +1,20 @@
 var mongoose = require('mongoose');
-var unique = require('mongoose-unique-validator');
+//var unique = require('mongoose-unique-validator');
 
 var FacturaSchema = new mongoose.Schema({
-    proveedor:String,  //Propiedades que tiene este modelo(campos que almacene o cree en la base de datos)(podemos tiparlo)
-    cif:String,
-    fecha:String,
-    base:Number,
-    tipo:Number,
-    importe:String,
-    total:String,
-    irpf:String,
-    retencion:Boolean,
-    fecha:String,
-    fechaRegistro:Date,
-    concepto:String
+    proveedor: String,
+    cif: String,
+    domicilio: String,
+    fecha: String,
+    concepto: String,
+    base: Number,
+    retencion: Boolean,
+    tipo: Number,
+    irpf: String,
+    importe: String,
+    total: String
 })
 
-//Al objeto de errores de mongoose
-// FacturaSchema.plugin(unique, {message: 'El CIF introducido ya existe'});
-module.exports = mongoose.model('Factura', FacturaSchema);  //Exportamos para poder usarlo en otro documento
+//FacturaSchema.plugin(unique, { message: 'El cif introducido ya existe'});
 
+module.exports = mongoose.model('Factura', FacturaSchema);

@@ -1,23 +1,90 @@
-var express = require('express'); //Importamos Express
-var mongoose = require('mongoose'); //Importamos mongoose
+var express = require('express');
+var mongoose = require('mongoose');
 
-var Cliente = require('../Models/cliente.js'); //Conectamos la ruta con el modelo (se puede poner sin parémtesis)
+var Cliente = require('../models/cliente.js');
 
 var app = express();
 
-app.get('/', (req, res, next)=>{
-    
-    Cliente.find({}).exec((err, clientes)=>{ //Para que nos busque todos los clientes
-        if (err)    //Si hubiera un error
+app.get('/', (req, res, next) => {
+
+    Cliente.find({}).exec((err, clientes)=>{
+        if(err){
             return res.status(500).json({
-                ok:false,
-                mensaje:'Error acceso DB',
+                ok: false,
+                mensaje: 'Error acceso DB',
                 errores: err
             })
+        }
         res.status(200).json({
             ok: true,
             clientes: clientes
-        });        
+        })
+    });
+});
+
+app.get('/nombre/:nombre', (req, res, next) => {
+
+    var nombre = req.params.nombre;
+
+    Cliente.find({nombre:{$regex:nombre,$options:'i'}}).exec((err, clientes)=>{
+        if(err){
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error acceso DB',
+                errores: err
+            })
+        }
+        res.status(200).json({
+            ok: true,
+            clientes: clientes
+        })
+    });
+
+});
+
+app.get('/localidad/:localidad', (req, res, next) => {
+
+    var localidad = req.params.localidad;
+
+    Cliente.find({localidad:{$regex:localidad,$options:'i'}}).exec((err, clientes)=>{
+        if(err){
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error acceso DB',
+                errores: err
+            })
+        }
+        res.status(200).json({
+            ok: true,
+            clientes: clientes
+        })
+    });
+
+});
+
+
+app.get('/mixto/:nombre/:localidad', (req, res, next) => {
+
+    var nombre = req.params.nombre;
+    var localidad = req.params.localidad;
+
+    // Cliente.find({$or:[{nombre:{$regex:nombre,$options:'i'}},
+    //                    {localidad:{$regex:localidad, $options:'i'}}]})
+    Cliente.find({nombre:{$regex:nombre,$options:'i'},
+                  localidad:{$regex:localidad, $options:'i'}}
+                )
+        .exec((err, clientes)=>{
+        if(err){
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error acceso DB',
+                errores: err
+            })
+        }
+        res.status(200).json({
+            ok: true,
+            clientes: clientes
+        })
     });
 
 });
@@ -25,72 +92,78 @@ app.get('/', (req, res, next)=>{
 app.get('/:id', function(req, res, next){
     
     Cliente.findById(req.params.id, (err, cliente)=>{
-        if (err) {   //Si hubiera un error
+        if(err){
             return res.status(500).json({
-                ok:false,
-                mensaje:'Error acceso DB',
+                ok: false,
+                mensaje: 'Error acceso DB',
                 errores: err
             })
         }
         res.status(200).json({
             ok: true,
             cliente: cliente
-        });   
-    });
+        })
+    })  
 });
 
-app.post('/', (req,res)=>{
 
-    var body = req.body;   //En el cuerpo de las peticiones res. que hagamos vamos a mandar un json
+app.post('/', (req, res)=>{
 
-    var cliente = new Cliente({  //Nos creamos la asociación para cada propiedad
+    var body = req.body;
+
+    var cliente = new Cliente({
         nombre: body.nombre,
         cif: body.cif,
         domicilio: body.domicilio,
         cp: body.cp,
         localidad: body.localidad,
         provincia: body.provincia,
-        telefono: body.telefono,    
+        telefono: body.telefono,
         email: body.email,
-        contacto: body.contacto,
-    })
+        contacto: body.contacto
+    });
 
-    cliente.save((err, clienteGuardado)=>{    //Guardar en la base de datos las propiedades que le demos
-        if(err) {   //Si hay error
-            return res.status(400).json({   //conteste con un json
-                ok: false,  //De que es falso
-                mensaje: 'Error al crear el cliente', //Con este mensaje
-                errores:err //Error sea err
+    cliente.save((err, clienteGuardado)=>{
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Error al crear el cliente',
+                errores: err
             })
         }
-        res.status(200).json({  //si la respuesta es correcta
-            ok:true, //Y sea verdadero
-            cliente: clienteGuardado //conteste el cliente ya creado
-        });
+
+        res.status(200).json({
+            ok: true,
+            cliente: clienteGuardado
+        })
     });
+
+
 });
 
 app.put('/:id', function(req, res, next){
-        //params extrae el parámetro de la pregunta (req)
+
     Cliente.findByIdAndUpdate(req.params.id, req.body, function(err, datos){
-        if(err) return next (err);
+        if (err) return next(err);
         res.status(201).json({
-            ok:true,
-            mensaje:'Cliente actualizado'
+            ok: 'true',
+            mensaje: 'Cliente actualizado'
         });
-    });        
+    });
+
 });
 
 app.delete('/:id', function(req, res, error){
 
     Cliente.findByIdAndRemove(req.params.id, function(err, datos){
-        if(err) return next (err);
+        if (err) return next(err);
+        var mensaje = 'Cliente eliminado';
         res.status(200).json({
-            ok:true,
-            mensaje:'Cliente eliminado'
-        });
-    });
-});
+            ok: 'true',
+            mensaje: mensaje
+        }); 
+    })
 
+});
 
 module.exports = app;

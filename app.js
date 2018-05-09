@@ -7,7 +7,9 @@ var usuario = require('./routes/usuario.js');
 var login = require('./routes/login.js');
 var cliente = require('./routes/cliente.js');
 var presupuesto = require('./routes/presupuesto.js');
-var sesion = require('./routes/sesion.js')
+var sesion = require('./routes/sesion.js');
+var articulo = require('./routes/articulo.js');
+
 
 
 var app = express();
@@ -41,6 +43,8 @@ app.use('/login',login);
 app.use('/cliente',cliente);
 app.use('/presupuesto',presupuesto);
 app.use('/sesion',sesion);
+app.use('/articulo',articulo);
+
 
 
 

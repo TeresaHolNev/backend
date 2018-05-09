@@ -1,14 +1,14 @@
-var jsonwebtoken = require ('jsonwebtoken');
+var jsonwebtoken = require('jsonwebtoken');
 
 exports.verificarToken = function(req, res, next){
 
-    var token = res.query.token;
+    var token = req.query.token;
 
-    jsonwebtoken.verify(token,'yitkjhgtkvbfcdgjfxchngf', (err,decoded)=>{
+    jsonwebtoken.verify(token, 'hghjgersweio', (err, decoded)=>{
         if(err){
-            return resizeBy.status(400).json({
-                ok:false,
-                mensaje:'token incorrecto',
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'token incorrecto',
                 errores: err
             })
         }
@@ -16,4 +16,5 @@ exports.verificarToken = function(req, res, next){
         req.usuario = decoded.usuario;
         next();
     })
+
 }
